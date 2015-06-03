@@ -30,7 +30,7 @@ This is an API for a service that validates credit numbers. The API can be acces
       ```
     - GET /api/v1/get
 
-      Return all credit card data from database in as a JSON string. Simply type the link below in the browser after running local web server using the ```rackup``` command in terminal. This function is not currently available on our online API validation service.
+      Returns all credit card data from database in as a JSON string. Simply type the link below in the browser after running the local web server using the ```rackup``` command in terminal. This function is not available on our online API validation service.
       ```
       http://127.0.0.1:9292/api/v1/get
       ```
