@@ -27,6 +27,7 @@ GEM
     jwt (1.5.0)
     minitest (5.7.0)
     openssl (1.0.0.beta)
+    pg (0.18.2)
     protected_attributes (1.0.9)
       activemodel (>= 4.0.1, < 5.0)
     rack (1.6.1)
@@ -80,6 +81,7 @@ DEPENDENCIES
   jwt
   minitest
   openssl
+  pg
   protected_attributes
   rack
   rack-test

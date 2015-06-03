@@ -20,6 +20,7 @@ group :development do
   gem 'hirb'
 end
 
+
 group :test do
   gem 'minitest'
   gem 'rack'
@@ -29,5 +30,5 @@ group :test do
 end
 
 group :production do
-  #gem 'pg'
+  gem 'pg'
 end
