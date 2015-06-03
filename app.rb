@@ -6,7 +6,7 @@ require_relative './model/credit_card'
 
 # Credit Card API
 class CreditCardAPI < Sinatra::Base
-  
+
   enable :logging
 
   configure :development, :test do
@@ -16,7 +16,7 @@ class CreditCardAPI < Sinatra::Base
   end
 
   get '/' do
-    'The CreditCardAPI is up and running!'
+    'The Credit Card API is up and running!'
   end
 
   get '/api/v1/credit_card/validate' do
