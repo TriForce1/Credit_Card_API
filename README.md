@@ -1,6 +1,6 @@
 # Credit Card API Service
 
-This is an API for a service that validates credit numbers. The API can be accessed at http://credit-card-api.herokuapp.com.
+This is an API for a service that validates credit numbers. The API can be accessed at http://creditcard-api.herokuapp.com.
 
 ## Note! Please do before use
   1. Run ```bundle install```
@@ -18,7 +18,7 @@ This is an API for a service that validates credit numbers. The API can be acces
 
       The link below is an example of an invalid card number.
 
-      http://credit-card-api.herokuapp.com/api/v1/credit_card/validate?card_number=4024097178888052
+      http://creditcard-api.herokuapp.com/api/v1/credit_card/validate?card_number=4024097178888052
 
       The card_number value can be changed to whatever number you would like to validate. The service will return a JSON string containing the number you entered and the card's validation status. e.g.
        ```
@@ -49,5 +49,5 @@ This is an API for a service that validates credit numbers. The API can be acces
 
 		Curl can also be used to post to the online database of our service. Below is the format.
       ```
-      curl -H 'accept: application/json' -H 'content-type: application/json' http://credit-card-api.herokuapp.com/api/v1/credit_card -d "{\"number\":\"5192234226081802\",\"expiration_date\":\"2017-04-19\",\"owner\":\"Cheng-Yu Hsu\",\"credit_network\":\"Visa\"}"
+      curl -H 'accept: application/json' -H 'content-type: application/json' http://creditcard-api.herokuapp.com/api/v1/credit_card -d "{\"number\":\"5192234226081802\",\"expiration_date\":\"2017-04-19\",\"owner\":\"Cheng-Yu Hsu\",\"credit_network\":\"Visa\"}"
       ```
