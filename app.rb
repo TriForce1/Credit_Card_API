@@ -9,7 +9,7 @@ class CreditCardAPI < Sinatra::Base
 
   enable :logging
 
-  configure :development, :test do
+  configure  do
     require 'hirb'
     Hirb.enable
     ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
@@ -43,7 +43,8 @@ class CreditCardAPI < Sinatra::Base
       number: req['number'],
       expiration_date: req['expiration_date'],
       owner: req['owner'],
-      credit_network: req['credit_network']
+      credit_network: req['credit_network'],
+      user_id: req['user_id']
     )
 
     begin
