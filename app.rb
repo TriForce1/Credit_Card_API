@@ -59,7 +59,7 @@ class CreditCardAPI < Sinatra::Base
     end
   end
 
-  get '/api/v1/get' do
+  get '/api/v1/credit_card' do
     begin
       creditcards = CreditCard.all.to_json
     rescue
