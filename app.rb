@@ -3,6 +3,8 @@ require 'config_env'
 require 'json'
 require 'protected_attributes'
 require_relative './model/credit_card'
+require 'rbnacl/libsodium'
+require 'jwt'
 
 # Credit Card API
 class CreditCardAPI < Sinatra::Base
@@ -13,6 +15,17 @@ class CreditCardAPI < Sinatra::Base
     require 'hirb'
     Hirb.enable
     ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
+  end
+
+  def authenticate_client_from_header(authorization)
+    scheme, jwt = authorization.split(' ')
+    ui_key = OpenSSL::PKey::RSA.new(ENV['UI_PUBLIC_KEY'])
+    payload, header = JWT.decode jwt, ui_key
+    @user_id = payload['sub']
+    result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'https://creditcardserviceapp.herokuapp.com')
+    return result
+  rescue
+    false
   end
 
   get '/' do
@@ -31,12 +44,15 @@ class CreditCardAPI < Sinatra::Base
     # Validate for string length and correct type
     if result == false || params[:card_number].length < 2
       return { "Card" => params[:card_number], "validated" => "false" }.to_json
-    end    
+    end
 
     {"Card" => params[:card_number], "validated" => c.validate_checksum}.to_json
   end
 
   post '/api/v1/credit_card' do
+    content_type :json
+    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
+
     request_json = request.body.read
     req = JSON.parse(request_json)
     creditcard = CreditCard.new(
