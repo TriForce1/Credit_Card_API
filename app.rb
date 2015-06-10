@@ -31,8 +31,7 @@ class CreditCardAPI < Sinatra::Base
     # Validate for string length and correct type
     if result == false || params[:card_number].length < 2
       return { "Card" => params[:card_number], "validated" => "false" }.to_json
-    end
-    
+    end    
 
     {"Card" => params[:card_number], "validated" => c.validate_checksum}.to_json
   end
