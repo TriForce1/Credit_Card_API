@@ -84,9 +84,9 @@ class CreditCardAPI < Sinatra::Base
     content_type :json
     begin
       creditcards = CreditCard.where("user_id = ?", params[:user_id])
-      creditcard.map { |e|
-        e["encrypted_number"] = e.number
-      }.to_json
+      # creditcard.map { |e|
+      #   e["encrypted_number"] = e.number
+      # }.to_json
     rescue
       halt 500
     end
