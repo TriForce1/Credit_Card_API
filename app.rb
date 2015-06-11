@@ -36,6 +36,12 @@ class CreditCardAPI < Sinatra::Base
     false
   end
 
+  def get_card_number(creditcards)
+    creditcards.each { |x|
+      secret_box = RbNaCl::SecretBox.new(key)
+       x[:encrypted_number] = secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number]))}.to_json
+  end
+
   def key
     Base64.urlsafe_decode64(ENV['DB_KEY'])
   end
@@ -90,9 +96,7 @@ class CreditCardAPI < Sinatra::Base
     content_type :json
     begin
       creditcards = CreditCard.where("user_id = ?", params[:user_id])
-      creditcards.each { |x|        
-        secret_box = RbNaCl::SecretBox.new(key)
-         x[:encrypted_number] = secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number]))}.to_json
+      get_card_number(creditcards)    
     rescue
       halt 500
     end
