@@ -25,6 +25,7 @@ class CreditCardAPI < Sinatra::Base
     @user_id = payload['sub']
     result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'https://creditcardserviceapp.herokuapp.com')
     return result
+    
   rescue
     false
   end
