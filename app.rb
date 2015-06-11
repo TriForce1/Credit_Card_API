@@ -14,6 +14,7 @@ configure  :develpoment, :test, :production do
   ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
 end
 
+
 class CreditCardAPI < Sinatra::Base
 
   enable :logging
@@ -32,6 +33,10 @@ class CreditCardAPI < Sinatra::Base
     return result
   rescue
     false
+  end
+
+  def key
+    Base64.urlsafe_decode64(ENV['DB_KEY'])
   end
 
   get '/' do
@@ -85,7 +90,7 @@ class CreditCardAPI < Sinatra::Base
     begin
       creditcards = CreditCard.where("user_id = ?", params[:user_id])
       creditcards.each { |x|
-        secret_box = RbNaCl::SecretBox.new(x.key)
+        secret_box = RbNaCl::SecretBox.new(key)
          x[:encrypted_number] = secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number]))}
     rescue
       halt 500
