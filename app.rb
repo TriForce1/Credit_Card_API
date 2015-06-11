@@ -84,7 +84,6 @@ class CreditCardAPI < Sinatra::Base
     content_type :json
     begin
       creditcards = CreditCard.where("user_id = ?", params[:user_id]).to_json
-      puts creditcard
     rescue
       halt 500
     end
