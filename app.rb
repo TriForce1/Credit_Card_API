@@ -59,10 +59,10 @@ class CreditCardAPI < Sinatra::Base
     content_type :json
     # halt 401 unless
     puts authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
-
     request_json = request.body.read
     req = JSON.parse(request_json)
     creditcard = CreditCard.new(
+      user_id: req['user_id'],
       number: req['number'],
       expiration_date: req['expiration_date'],
       owner: req['owner'],
@@ -82,9 +82,10 @@ class CreditCardAPI < Sinatra::Base
     end
   end
 
+
   get '/api/v1/credit_card' do
     begin
-      creditcards = CreditCard.all.to_json
+      creditcards = CreditCard.find_by_user_id(params[:user_id]).to_json
     rescue
       halt 500
     end

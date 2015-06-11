@@ -14,6 +14,7 @@
 ActiveRecord::Schema.define(version: 20150421081203) do
 
   create_table "credit_cards", force: :cascade do |t|
+    t.integer  "user_id"
     t.string   "nonce"
     t.string   "encrypted_number"
     t.string   "owner"
@@ -21,7 +22,5 @@ ActiveRecord::Schema.define(version: 20150421081203) do
     t.string   "credit_network"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
-    t.string   "user_id"
   end
-
 end
