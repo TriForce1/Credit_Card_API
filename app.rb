@@ -36,10 +36,11 @@ class CreditCardAPI < Sinatra::Base
     {"Card" => params[:card_number], "validated" => c.validate_checksum}.to_json
   end
 
-  post '/api/v1/credit_card' do
+  post '/api/v1/credit_card?user_id=#' do
     request_json = request.body.read
     req = JSON.parse(request_json)
     creditcard = CreditCard.new(
+      user_id: req['user_id'],
       number: req['number'],
       expiration_date: req['expiration_date'],
       owner: req['owner'],
@@ -58,9 +59,9 @@ class CreditCardAPI < Sinatra::Base
     end
   end
 
-  get '/api/v1/get' do
+  get '/api/v1/credit_card?user_id=#' do
     begin
-      creditcards = CreditCard.all.to_json
+      creditcards = CreditCard.find_by_user_id(params[:user_id]).to_json
     rescue
       halt 500
     end

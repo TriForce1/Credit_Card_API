@@ -13,11 +13,11 @@ gem 'activerecord'
 gem 'sinatra-activerecord'
 gem 'protected_attributes'
 gem 'jwt'
+gem 'tux'
+gem 'hirb'
 
 group :development do
   gem 'sqlite3'
-  gem 'tux'
-  gem 'hirb'
 end
 
 
