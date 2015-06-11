@@ -90,9 +90,7 @@ class CreditCardAPI < Sinatra::Base
     content_type :json
     begin
       creditcards = CreditCard.where("user_id = ?", params[:user_id])
-      creditcards.each { |x|
-        puts key
-        puts x
+      creditcards.each { |x|        
         secret_box = RbNaCl::SecretBox.new(key)
          x[:encrypted_number] = secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number]))}.to_json
     rescue
