@@ -57,7 +57,8 @@ class CreditCardAPI < Sinatra::Base
 
   post '/api/v1/credit_card' do
     content_type :json
-    # halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
+    # halt 401 unless
+    puts authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
 
     request_json = request.body.read
     req = JSON.parse(request_json)
