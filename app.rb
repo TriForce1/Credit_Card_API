@@ -38,7 +38,7 @@ class CreditCardAPI < Sinatra::Base
     'The Credit Card API is up and running!'
   end
 
-  get '/api/v1/credit_card/validate' do
+  get '/api/v1/credit_card/validate/:card_number' do
     c = CreditCard.new(
       number: params[:card_number]
     )
