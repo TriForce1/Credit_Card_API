@@ -7,6 +7,7 @@ require 'rbnacl/libsodium'
 require 'jwt'
 require 'openssl'
 require 'base64'
+require 'sinatra/activerecord'
 
 # Credit Card API
 configure  :develpoment, :test, :production do
