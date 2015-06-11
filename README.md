@@ -1,6 +1,6 @@
 # Credit Card API Service
 
-This is an API for a service that validates credit numbers. The API can be accessed at http://creditcard-api.herokuapp.com.
+This is an API for a service that validates credit numbers. The API can be accessed at http://credit-card-service-api.herokuapp.com.
 
 ## Note! Please do before use
   1. Run ```bundle install```
@@ -14,11 +14,11 @@ This is an API for a service that validates credit numbers. The API can be acces
     - GET /
 
       Root route
-    - GET /api/v1/credit_card/validate
+    - GET /api/v1/credit_card/validate/:card_number
 
       The link below is an example of an invalid card number.
 
-      http://creditcard-api.herokuapp.com/api/v1/credit_card/validate?card_number=4024097178888052
+      http://credit-card-service-api.herokuapp.com/api/v1/credit_card/validate?card_number=4024097178888052
 
       The card_number value can be changed to whatever number you would like to validate. The service will return a JSON string containing the number you entered and the card's validation status. e.g.
        ```
@@ -28,7 +28,7 @@ This is an API for a service that validates credit numbers. The API can be acces
       ```
         card_number=4916603231464963
       ```
-    - GET /api/v1/credit_card?user_id=#
+    - GET /api/v1/credit_card/:user_id
 
       Returns ONLY the credit card data from the database(as a JSON string) which matches the particular user_id sent. Simply type the link below in the browser after running the local web server using the ```rackup``` command in terminal. This function is not available on our online API validation service.
       ```
@@ -40,7 +40,7 @@ This is an API for a service that validates credit numbers. The API can be acces
 
     The Post path allows you to post or save valid credit card numbers to your database. Numbers that do not pass the validation will not be saved to database. Post paths are not currently on the online API and can only be use locally. Before using the post route remember to run the ```rake db:migrate``` command.
 
-    - POST /api/v1/credit_card?user_id=#
+    - POST /api/v1/credit_card
 
       The curl tool is used to test the above POST route. Below is a valid example of how you can insert data into your local database.
       ```
@@ -49,9 +49,9 @@ This is an API for a service that validates credit numbers. The API can be acces
 
 		Curl can also be used to post to the online database of our service. Below is the format.
       ```
-      curl -X POST --header "Authorization: Bearer [VALID JWT]" http://creditcard-api.herokuapp.com/api/v1/credit_card?user_id=#
+      curl -X POST --header "Authorization: Bearer [VALID JWT]" http://credit-card-service-api.herokuapp.com/api/v1/credit_card?user_id=#
       ```
 			Curl can also be used to verify a JWT as well.
 			```
-			curl -v -X POST --header "Authorization: Bearer [BAD JWT]" http://creditcard-api.herokuapp.com/api/v1/credit_card?user_id=#
+			curl -v -X POST --header "Authorization: Bearer [BAD JWT]" http://credit-card-service-api.herokuapp.com/api/v1/credit_card?user_id=#
       ```
