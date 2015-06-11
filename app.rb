@@ -9,27 +9,24 @@ require 'openssl'
 require 'base64'
 
 # Credit Card API
+configure  :develpoment, :test do
+  require 'config_env'
+  ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
+end
+
 class CreditCardAPI < Sinatra::Base
 
   enable :logging
-
-  configure  :develpoment, :test do
-    require 'config_env'
-    ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
-  end
 
   configure  do
     Hirb.enable
   end
 
   def authenticate_client_from_header(authorization)
-    puts 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
     scheme, jwt = authorization.split(' ')
-    puts 'HELLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO'
+    puts jwt
     ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
-    puts 'HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII'
     payload, header = JWT.decode jwt, ui_key
-    puts 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz'
     @user_id = payload['sub']
     result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'https://creditcardserviceapp.herokuapp.com')
     return result
