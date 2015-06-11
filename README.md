@@ -14,7 +14,7 @@ This is an API for a service that validates credit numbers. The API can be acces
     - GET /
 
       Root route
-    - GET /api/v1/credit_card/validate
+    - GET /api/v1/credit_card/validate/:card_number
 
       The link below is an example of an invalid card number.
 
@@ -28,7 +28,7 @@ This is an API for a service that validates credit numbers. The API can be acces
       ```
         card_number=4916603231464963
       ```
-    - GET /api/v1/credit_card?user_id=#
+    - GET /api/v1/credit_card/:user_id
 
       Returns ONLY the credit card data from the database(as a JSON string) which matches the particular user_id sent. Simply type the link below in the browser after running the local web server using the ```rackup``` command in terminal. This function is not available on our online API validation service.
       ```
@@ -40,7 +40,7 @@ This is an API for a service that validates credit numbers. The API can be acces
 
     The Post path allows you to post or save valid credit card numbers to your database. Numbers that do not pass the validation will not be saved to database. Post paths are not currently on the online API and can only be use locally. Before using the post route remember to run the ```rake db:migrate``` command.
 
-    - POST /api/v1/credit_card?user_id=#
+    - POST /api/v1/credit_card
 
       The curl tool is used to test the above POST route. Below is a valid example of how you can insert data into your local database.
       ```
