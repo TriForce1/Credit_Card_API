@@ -6,6 +6,7 @@ require_relative './model/credit_card'
 require 'rbnacl/libsodium'
 require 'jwt'
 require 'openssl'
+require 'base64'
 
 # Credit Card API
 class CreditCardAPI < Sinatra::Base
@@ -25,7 +26,7 @@ class CreditCardAPI < Sinatra::Base
     @user_id = payload['sub']
     result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'https://creditcardserviceapp.herokuapp.com')
     return result
-    
+
   rescue
     false
   end
