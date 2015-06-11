@@ -56,13 +56,12 @@ class CreditCardAPI < Sinatra::Base
 
     request_json = request.body.read
     req = JSON.parse(request_json)
-    puts req['user_id']
     creditcard = CreditCard.new(
       number: req['number'],
       expiration_date: req['expiration_date'],
       owner: req['owner'],
       credit_network: req['credit_network'],
-      user_id: req['user_id']
+      user_id: req['user_id'].to_s
     )
 
     begin
