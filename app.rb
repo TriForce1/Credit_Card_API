@@ -36,7 +36,7 @@ class CreditCardAPI < Sinatra::Base
     {"Card" => params[:card_number], "validated" => c.validate_checksum}.to_json
   end
 
-  post '/api/v1/credit_card?user_id=#' do
+  post '/api/v1/credit_card' do
     request_json = request.body.read
     req = JSON.parse(request_json)
     creditcard = CreditCard.new(
@@ -59,7 +59,7 @@ class CreditCardAPI < Sinatra::Base
     end
   end
 
-  get '/api/v1/credit_card?user_id=#' do
+  get '/api/v1/credit_card?user_id=:user_id' do
     begin
       creditcards = CreditCard.find_by_user_id(params[:user_id]).to_json
     rescue
