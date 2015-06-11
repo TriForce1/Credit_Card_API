@@ -26,7 +26,6 @@ class CreditCardAPI < Sinatra::Base
     @user_id = payload['sub']
     result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'https://creditcardserviceapp.herokuapp.com')
     return result
-
   rescue
     false
   end
@@ -63,7 +62,7 @@ class CreditCardAPI < Sinatra::Base
       expiration_date: req['expiration_date'],
       owner: req['owner'],
       credit_network: req['credit_network'],
-      user_id: req['user_id'].to_s
+      user_id: req['user_id']
     )
 
     begin
