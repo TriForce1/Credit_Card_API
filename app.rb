@@ -59,9 +59,10 @@ class CreditCardAPI < Sinatra::Base
     end
   end
 
-  get '/api/v1/credit_card?user_id=:user_id' do
+  get '/api/v1/credit_card/:user_id' do
+    content_type :json
     begin
-      creditcards = CreditCard.find_by_user_id(params[:user_id]).to_json
+      creditcards = CreditCard.where("user_id = ?", params[:user_id]).to_json
     rescue
       halt 500
     end
