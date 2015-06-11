@@ -9,7 +9,7 @@ require 'openssl'
 require 'base64'
 
 # Credit Card API
-configure  :develpoment, :test do
+configure  :develpoment, :test, :production do
   require 'config_env'
   ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
 end
