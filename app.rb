@@ -7,12 +7,14 @@ require 'rbnacl/libsodium'
 require 'jwt'
 require 'openssl'
 require 'base64'
+require 'sinatra/activerecord'
 
 # Credit Card API
 configure  :develpoment, :test, :production do
   require 'config_env'
   ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
 end
+
 
 class CreditCardAPI < Sinatra::Base
 
@@ -32,6 +34,16 @@ class CreditCardAPI < Sinatra::Base
     return result
   rescue
     false
+  end
+
+  def get_card_number(creditcards)
+    creditcards.each { |x|
+      secret_box = RbNaCl::SecretBox.new(key)
+       x[:encrypted_number] = secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number]))}.to_json
+  end
+
+  def key
+    Base64.urlsafe_decode64(ENV['DB_KEY'])
   end
 
   get '/' do
@@ -83,7 +95,8 @@ class CreditCardAPI < Sinatra::Base
   get '/api/v1/credit_card/:user_id' do
     content_type :json
     begin
-      creditcards = CreditCard.where("user_id = ?", params[:user_id]).to_json
+      creditcards = CreditCard.where("user_id = ?", params[:user_id])
+      get_card_number(creditcards)    
     rescue
       halt 500
     end
