@@ -1,5 +1,5 @@
 require 'sinatra'
-require 'config_env'
+require 'hirb'
 require 'json'
 require 'protected_attributes'
 require_relative './model/credit_card'
@@ -13,10 +13,13 @@ class CreditCardAPI < Sinatra::Base
 
   enable :logging
 
-  configure  do
-    require 'hirb'
-    Hirb.enable
+  configure  :develpoment, :test do
+    require 'config_env'
     ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
+  end
+
+  configure  do
+    Hirb.enable
   end
 
   def authenticate_client_from_header(authorization)
@@ -57,8 +60,7 @@ class CreditCardAPI < Sinatra::Base
 
   post '/api/v1/credit_card' do
     content_type :json
-    # halt 401 unless
-    puts authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
+    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     request_json = request.body.read
     req = JSON.parse(request_json)
     creditcard = CreditCard.new(
