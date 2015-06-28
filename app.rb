@@ -9,10 +9,9 @@ require 'openssl'
 require 'base64'
 require 'sinatra/activerecord'
 require 'config_env'
+require 'rack/ssl-enforcer'
 
 # Credit Card API
-
-
 class CreditCardAPI < Sinatra::Base
 
   enable :logging
@@ -25,15 +24,23 @@ class CreditCardAPI < Sinatra::Base
     Hirb.enable
   end
 
-  def authenticate_client_from_header(authorization)    
-      scheme, jwt = authorization.split(' ')
-      ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
-      payload, header = JWT.decode jwt, ui_key
-      @user_id = payload['sub']
-      result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'http://creditcardserviceapp.herokuapp.com')
-      return result
-    rescue
-      false
+  configure :production do
+    use Rack::SslEnforcer
+    set :session_secret, ENV['MSG_KEY']
+  end
+
+  def authenticate_client_from_header(authorization)
+    scheme, jwt = authorization.split(' ')
+    puts scheme
+    puts jwt
+    ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
+    payload, header = JWT.decode jwt, ui_key
+    @user_id = payload['sub']
+    result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'http://creditcardserviceapp.herokuapp.com')
+    puts result
+    return result
+  rescue
+    false
   end
 
   def get_card_number(creditcards)
@@ -50,7 +57,9 @@ class CreditCardAPI < Sinatra::Base
     'The Credit Card API is up and running!'
   end
 
-  get '/api/v1/credit_card/validate/:card_number' do
+  get '/api/v1/credit_card/validate' do
+    content_type :json
+    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     c = CreditCard.new(
       number: params[:card_number]
     )
@@ -68,7 +77,7 @@ class CreditCardAPI < Sinatra::Base
   end
 
   post '/api/v1/credit_card' do
-    content_type :json
+    # content_type :json
     halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     request_json = request.body.read
     req = JSON.parse(request_json)
@@ -94,9 +103,10 @@ class CreditCardAPI < Sinatra::Base
 
   get '/api/v1/credit_card/:user_id' do
     content_type :json
+    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     begin
       creditcards = CreditCard.where("user_id = ?", params[:user_id])
-      get_card_number(creditcards)    
+      get_card_number(creditcards)
     rescue
       halt 500
     end
