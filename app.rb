@@ -75,7 +75,7 @@ class CreditCardAPI < Sinatra::Base
   end
 
   post '/api/v1/credit_card' do
-    content_type :json
+    # content_type :json
     halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     request_json = request.body.read
     req = JSON.parse(request_json)
@@ -84,7 +84,7 @@ class CreditCardAPI < Sinatra::Base
       expiration_date: req['expiration_date'],
       owner: req['owner'],
       credit_network: req['credit_network'],
-      user_id: params['user_id']
+      user_id: req['user_id']
     )
 
     begin
