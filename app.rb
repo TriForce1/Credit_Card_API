@@ -50,8 +50,8 @@ class CreditCardAPI < Sinatra::Base
   end
 
   get '/api/v1/credit_card/validate' do
-    
-    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
+
+    # halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     c = CreditCard.new(
       number: params[:card_number]
     )
@@ -94,8 +94,8 @@ class CreditCardAPI < Sinatra::Base
   end
 
   get '/api/v1/credit_card' do
-    content_type :json
-    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
+    # content_type :json
+    # halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     begin
       creditcards = CreditCard.where("user_id = ?", params[:user_id])
       get_card_number(creditcards)
