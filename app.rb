@@ -29,7 +29,7 @@ class CreditCardAPI < Sinatra::Base
     ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
     payload, header = JWT.decode jwt, ui_key
     @user_id = payload['sub']
-    result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'https://creditcardserviceapp.herokuapp.com')
+    result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'http://creditcardserviceapp.herokuapp.com')
     return result
   rescue
     false
@@ -50,8 +50,8 @@ class CreditCardAPI < Sinatra::Base
   end
 
   get '/api/v1/credit_card/validate' do
-
-    # halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
+    content_type :json
+    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     c = CreditCard.new(
       number: params[:card_number]
     )
@@ -78,7 +78,7 @@ class CreditCardAPI < Sinatra::Base
       expiration_date: req['expiration_date'],
       owner: req['owner'],
       credit_network: req['credit_network'],
-      user_id: req['user_id']
+      user_id: params['user_id']
     )
 
     begin
@@ -94,8 +94,8 @@ class CreditCardAPI < Sinatra::Base
   end
 
   get '/api/v1/credit_card' do
-    # content_type :json
-    # halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
+    content_type :json
+    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     begin
       creditcards = CreditCard.where("user_id = ?", params[:user_id])
       get_card_number(creditcards)
