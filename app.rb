@@ -8,32 +8,32 @@ require 'jwt'
 require 'openssl'
 require 'base64'
 require 'sinatra/activerecord'
+require 'config_env'
 
 # Credit Card API
-configure  :develpoment, :test, :production do
-  require 'config_env'
-  ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
-end
 
 
 class CreditCardAPI < Sinatra::Base
 
   enable :logging
 
+  configure  :development, :test, :production do
+    ConfigEnv.path_to_config("#{__dir__}/config/config_env.rb")
+  end
+
   configure  do
     Hirb.enable
   end
 
-  def authenticate_client_from_header(authorization)
-    scheme, jwt = authorization.split(' ')
-    puts jwt
-    ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
-    payload, header = JWT.decode jwt, ui_key
-    @user_id = payload['sub']
-    result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'http://creditcardserviceapp.herokuapp.com')
-    return result
-  rescue
-    false
+  def authenticate_client_from_header(authorization)    
+      scheme, jwt = authorization.split(' ')
+      ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
+      payload, header = JWT.decode jwt, ui_key
+      @user_id = payload['sub']
+      result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'http://creditcardserviceapp.herokuapp.com')
+      return result
+    rescue
+      false
   end
 
   def get_card_number(creditcards)
