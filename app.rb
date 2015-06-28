@@ -8,6 +8,7 @@ require 'jwt'
 require 'openssl'
 require 'base64'
 require 'sinatra/activerecord'
+require 'rack/ssl-enforcer'
 
 # Credit Card API
 configure  :develpoment, :test, :production do
@@ -22,6 +23,11 @@ class CreditCardAPI < Sinatra::Base
 
   configure  do
     Hirb.enable
+  end
+
+  configure :production do
+    use Rack::SslEnforcer
+    set :session_secret, ENV['MSG_KEY']
   end
 
   def authenticate_client_from_header(authorization)
