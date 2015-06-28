@@ -26,7 +26,6 @@ class CreditCardAPI < Sinatra::Base
 
   def authenticate_client_from_header(authorization)
     scheme, jwt = authorization.split(' ')
-    puts jwt
     ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
     payload, header = JWT.decode jwt, ui_key
     @user_id = payload['sub']
@@ -50,7 +49,9 @@ class CreditCardAPI < Sinatra::Base
     'The Credit Card API is up and running!'
   end
 
-  get '/api/v1/credit_card/validate/:card_number' do
+  get '/api/v1/credit_card/validate' do
+    content_type :json
+    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     c = CreditCard.new(
       number: params[:card_number]
     )
@@ -77,7 +78,7 @@ class CreditCardAPI < Sinatra::Base
       expiration_date: req['expiration_date'],
       owner: req['owner'],
       credit_network: req['credit_network'],
-      user_id: req['user_id']
+      user_id: params['user_id']
     )
 
     begin
@@ -92,11 +93,12 @@ class CreditCardAPI < Sinatra::Base
     end
   end
 
-  get '/api/v1/credit_card/:user_id' do
+  get '/api/v1/credit_card' do
     content_type :json
+    halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     begin
       creditcards = CreditCard.where("user_id = ?", params[:user_id])
-      get_card_number(creditcards)    
+      get_card_number(creditcards)
     rescue
       halt 500
     end
