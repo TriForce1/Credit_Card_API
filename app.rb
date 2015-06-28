@@ -78,7 +78,7 @@ class CreditCardAPI < Sinatra::Base
       expiration_date: req['expiration_date'],
       owner: req['owner'],
       credit_network: req['credit_network'],
-      user_id: params['user_id']
+      user_id: req['user_id']
     )
 
     begin
