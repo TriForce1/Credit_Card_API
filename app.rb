@@ -122,6 +122,7 @@ class CreditCardAPI < Sinatra::Base
       card_list = get_card_number(creditcards)
       c_index = {user_id: @user_id, cards: card_list }
       settings.cards_cache.set(@user_id, c_index.to_json)
+      puts c_index
       c_index
   end
 
