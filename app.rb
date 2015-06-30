@@ -115,6 +115,7 @@ class CreditCardAPI < Sinatra::Base
     end
     cards.to_json
   end
+
   def card_index
     creditcards = CreditCard.where("user_id = ?", @user_id)
     card_list = get_card_number(creditcards)
@@ -124,10 +125,14 @@ class CreditCardAPI < Sinatra::Base
   end
 
   def get_card_number(creditcards)
-    creditcards.each do |x|
+    c_list = creditcards.map(){ |x|
       secret_box = RbNaCl::SecretBox.new(key)
-      x[:encrypted_number] = ("*"*12) + secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join
-    end
+      {c_number: ("*"*12) + secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join,
+      owner: x.owner,
+      date: x.created_at,
+      network: x.credit_network,
+      expiration: x.expiration_date
+      }}
   end
 
 end
