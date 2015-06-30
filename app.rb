@@ -110,10 +110,10 @@ class CreditCardAPI < Sinatra::Base
     halt 401 unless @params[:user_id] == @user_id.to_s
     begin
       cards = card_index
-      cards.to_json
     rescue
-      halt 500
+      halt 500   
     end
+    cards.to_json
   end
   def card_index
     creditcards = CreditCard.where("user_id = ?", @user_id)
