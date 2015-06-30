@@ -107,9 +107,8 @@ class CreditCardAPI < Sinatra::Base
   get '/api/v1/credit_card' do
     content_type :json
     halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
-    halt 401 unless @params[:user_id] == @user_id
+    halt 401 unless @params[:user_id] == @user_id.to_s
     begin
-
       cards = card_index
       cards.to_json
     rescue
