@@ -135,6 +135,6 @@ class CreditCardAPI < Sinatra::Base
     scheme, jwt = authorization.split(' ')
     ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
     payload, header = JWT.decode jwt, ui_key
-    payload['sub']
+    payload['sub'].to_s
   end
 end
