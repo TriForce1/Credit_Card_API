@@ -110,6 +110,7 @@ class CreditCardAPI < Sinatra::Base
     halt 401 unless @params[:user_id] == @user_id.to_s
     begin
       cards = card_index
+      print cards
     rescue
       halt 500
     end
@@ -133,6 +134,7 @@ class CreditCardAPI < Sinatra::Base
       network: x.credit_network,
       expiration: x.expiration_date
       }}
+    c_list
   end
 
 end
