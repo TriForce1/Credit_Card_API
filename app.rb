@@ -126,9 +126,10 @@ class CreditCardAPI < Sinatra::Base
   end
 
   def get_card_number(creditcards)
+    puts 'begin'
     c_list = creditcards.map(){ |x|
       secret_box = RbNaCl::SecretBox.new(key)
-      {c_number: ("*"*12) + secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join,
+      {number: ("*"*12) + secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join,
       owner: x.owner,
       date: x.created_at,
       network: x.credit_network,
