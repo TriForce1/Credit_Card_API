@@ -97,6 +97,7 @@ class CreditCardAPI < Sinatra::Base
         halt 400
       else
         creditcard.save
+        card_index
         status 201
       end
     rescue
@@ -110,11 +111,11 @@ class CreditCardAPI < Sinatra::Base
     halt 401 unless @params[:user_id] == @user_id.to_s
     begin
       cards = card_index
-      print cards
+      cards.to_json
     rescue
       halt 500
     end
-    cards.to_json
+
   end
 
   def card_index
@@ -122,7 +123,6 @@ class CreditCardAPI < Sinatra::Base
       card_list = get_card_number(creditcards)
       c_index = {user_id: @user_id, cards: card_list }
       settings.cards_cache.set(@user_id, c_index.to_json)
-      puts c_index
       c_index
   end
 
