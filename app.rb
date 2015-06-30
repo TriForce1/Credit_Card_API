@@ -112,17 +112,21 @@ class CreditCardAPI < Sinatra::Base
       cards = card_index
       print cards
     rescue
-      halt 401
+      halt 500
     end
     cards.to_json
   end
 
   def card_index
-    creditcards = CreditCard.where("user_id = ?", @user_id)
-    card_list = get_card_number(creditcards)
-    c_index = {user_id: @user_id, cards: card_list }
-    settings.cards_cache.set(@user_id, c_index.to_json)
-    c_index
+    begin
+      creditcards = CreditCard.where("user_id = ?", @user_id)
+      card_list = get_card_number(creditcards)
+      c_index = {user_id: @user_id, cards: card_list }
+    rescue
+      halt 309
+      settings.cards_cache.set(@user_id, c_index.to_json)
+      c_index
+    end
   end
 
   def get_card_number(creditcards)
@@ -133,8 +137,7 @@ class CreditCardAPI < Sinatra::Base
       date: x.created_at,
       network: x.credit_network,
       expiration: x.expiration_date
-      }}
-    puts c_list
+      }}    
     c_list
   end
 
