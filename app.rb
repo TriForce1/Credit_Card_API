@@ -134,6 +134,7 @@ class CreditCardAPI < Sinatra::Base
       network: x.credit_network,
       expiration: x.expiration_date
       }}
+    puts c_list
     c_list
   end
 
