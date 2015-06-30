@@ -10,6 +10,9 @@ require 'base64'
 require 'sinatra/activerecord'
 require 'config_env'
 require 'rack/ssl-enforcer'
+require 'dalli'
+require 'active_support'
+require 'active_support/core_ext'
 
 # Credit Card API
 class CreditCardAPI < Sinatra::Base
@@ -22,6 +25,14 @@ class CreditCardAPI < Sinatra::Base
 
   configure  do
     Hirb.enable
+
+    set :ops_cache, Dalli::Client.new((ENV['MEMCACHIER_SERVERS'] || "").split(','), {
+        :username => ENV['MEMCACHIER_USERNAME'],
+        :password => ENV['MEMCACHIER_PASSWORD'],
+        :socket_timeout => 1.5,
+        :socket_failure_delay => 0.2
+      })
+
   end
 
   configure :production do
@@ -31,26 +42,40 @@ class CreditCardAPI < Sinatra::Base
 
   def authenticate_client_from_header(authorization)
     scheme, jwt = authorization.split(' ')
-    puts scheme
-    puts jwt
     ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
     payload, header = JWT.decode jwt, ui_key
     @user_id = payload['sub']
     result = (scheme =~ /^Bearer$/i) && (payload['iss'] == 'http://creditcardserviceapp.herokuapp.com')
-    puts result
     return result
   rescue
     false
   end
 
-  def get_card_number(creditcards)
-    creditcards.each { |x|
+  def get_user_id_from_header(authorization)
+    scheme, jwt = authorization.split(' ')
+    ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
+    payload, header = JWT.decode jwt, ui_key
+    return payload['sub'].to_s
+  end
+
+  def get_card_number
+    creditcards = CreditCard.where("user_id = ?", @user_id)
+    creditcards.each do |x|
       secret_box = RbNaCl::SecretBox.new(key)
-       x[:encrypted_number] = secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number]))}.to_json
+      puts x
+      x[:encrypted_number] = secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join
+    end.to_json
   end
 
   def key
     Base64.urlsafe_decode64(ENV['DB_KEY'])
+  end
+
+  def cc_index
+    cards = get_card_number
+    cc = { user_id: @user_id, creditcards: cards }
+    settings.ops_cache.set(@user_id, cc.to_json)
+    cc
   end
 
   get '/' do
@@ -104,9 +129,11 @@ class CreditCardAPI < Sinatra::Base
   get '/api/v1/credit_card/:user_id' do
     content_type :json
     halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
+    halt 401 unless @params[:user_id] == get_user_id_from_header(env['HTTP_AUTHORIZATION'])
+
     begin
-      creditcards = CreditCard.where("user_id = ?", params[:user_id])
-      get_card_number(creditcards)
+      ccs = cc_index
+      ccs.to_json
     rescue
       halt 500
     end
