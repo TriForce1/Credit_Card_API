@@ -107,7 +107,7 @@ class CreditCardAPI < Sinatra::Base
   get '/api/v1/credit_card' do
     content_type :json
     halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
-    halt 401 unless @params[:user_id] == get_user_id_from_header(env['HTTP_AUTHORIZATION'])
+    halt 401 unless @params[:user_id] == @user_id
     begin
 
       cards = card_index
@@ -128,13 +128,8 @@ class CreditCardAPI < Sinatra::Base
     creditcards.each do |x|
       secret_box = RbNaCl::SecretBox.new(key)
       x[:encrypted_number] = ("*"*12) + secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join
+      puts x[:encrypted_number]
     end
   end
 
-  def get_user_id_from_header(authorization)
-    scheme, jwt = authorization.split(' ')
-    ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
-    payload, header = JWT.decode jwt, ui_key
-    payload['sub'].to_s
-  end
 end
