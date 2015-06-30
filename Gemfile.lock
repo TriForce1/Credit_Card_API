@@ -19,6 +19,7 @@ GEM
     builder (3.2.2)
     config_env (0.1.0)
     daemons (1.2.2)
+    dalli (2.7.4)
     eventmachine (1.0.7)
     ffi (1.9.8)
     hirb (0.7.3)
@@ -40,6 +41,7 @@ GEM
       ffi
     rbnacl-libsodium (1.0.3)
       rbnacl (~> 3.0, >= 3.0.1)
+    rdiscount (2.1.8)
     ripl (0.7.1)
       bond (~> 0.5.1)
     ripl-multi_line (0.3.1)
@@ -75,7 +77,9 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  activesupport
   config_env
+  dalli
   hirb
   json
   jwt
@@ -87,6 +91,7 @@ DEPENDENCIES
   rack-test
   rake
   rbnacl-libsodium
+  rdiscount
   sinatra
   sinatra-activerecord
   sqlite3
