@@ -9,6 +9,11 @@ require 'openssl'
 require 'base64'
 require 'sinatra/activerecord'
 require 'rack/ssl-enforcer'
+require 'rdiscount'
+require 'tilt/rdiscount'
+require 'dalli'
+require 'active_support'
+require 'active_support/core_ext'
 
 # Credit Card API
 configure  :develpoment, :test, :production do
@@ -23,6 +28,12 @@ class CreditCardAPI < Sinatra::Base
 
   configure  do
     Hirb.enable
+    set :cards_cache, Dalli::Client.new((ENV["MEMCACHIER_SERVERS"] || "").split(","),
+     {:username => ENV["MEMCACHIER_USERNAME"],
+       :password => ENV["MEMCACHIER_PASSWORD"],
+       :socket_timeout => 1.5,
+       :socket_failure_delay => 0.2
+       })
   end
 
   configure :production do
@@ -39,12 +50,6 @@ class CreditCardAPI < Sinatra::Base
     return result
   rescue
     false
-  end
-
-  def get_card_number(creditcards)
-    creditcards.each { |x|
-      secret_box = RbNaCl::SecretBox.new(key)
-       x[:encrypted_number] = secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number]))}.to_json
   end
 
   def key
@@ -75,7 +80,7 @@ class CreditCardAPI < Sinatra::Base
   end
 
   post '/api/v1/credit_card' do
-    # content_type :json
+    content_type :json
     halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
     request_json = request.body.read
     req = JSON.parse(request_json)
@@ -84,7 +89,7 @@ class CreditCardAPI < Sinatra::Base
       expiration_date: req['expiration_date'],
       owner: req['owner'],
       credit_network: req['credit_network'],
-      user_id: req['user_id']
+      user_id: @user_id
     )
 
     begin
@@ -102,12 +107,35 @@ class CreditCardAPI < Sinatra::Base
   get '/api/v1/credit_card' do
     content_type :json
     halt 401 unless authenticate_client_from_header(env['HTTP_AUTHORIZATION'])
+    halt 401 unless @params[:user_id] == get_user_id_from_header(env['HTTP_AUTHORIZATION'])
     begin
-      creditcards = CreditCard.where("user_id = ?", params[:user_id])
-      get_card_number(creditcards)
+
+      cards = card_index
+      cards.to_json
     rescue
       halt 500
     end
+  end
+  def card_index
+    creditcards = CreditCard.where("user_id = ?", @user_id)
+    card_list = get_card_number(creditcards)
+    c_index = {user_id: @user_id, cards: card_list }
+    settings.cards_cache.set(@user_id, c_index.to_json)
+
+  end
+
+  def get_card_number(creditcards)
+    creditcards.each do |x|
+      secret_box = RbNaCl::SecretBox.new(key)
+      x[:encrypted_number] = ("*"*12) + secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join
+    end  
+  end
+
+  def get_user_id_from_header(authorization)
+    scheme, jwt = authorization.split(' ')
+    ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
+    payload, header = JWT.decode jwt, ui_key
+    return payload['sub'].to_s
   end
 
 end

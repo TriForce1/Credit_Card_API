@@ -15,6 +15,9 @@ gem 'jwt'
 gem 'tux'
 gem 'hirb'
 gem 'rack-ssl-enforcer'
+gem 'rdiscount'
+gem 'dalli'
+gem 'activesupport'
 
 group :development do
   gem 'sqlite3'
