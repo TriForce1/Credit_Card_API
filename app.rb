@@ -112,7 +112,7 @@ class CreditCardAPI < Sinatra::Base
       cards = card_index
       print cards
     rescue
-      halt 500
+      halt 401
     end
     cards.to_json
   end
@@ -126,7 +126,6 @@ class CreditCardAPI < Sinatra::Base
   end
 
   def get_card_number(creditcards)
-    puts 'begin'
     c_list = creditcards.map(){ |x|
       secret_box = RbNaCl::SecretBox.new(key)
       {number: ("*"*12) + secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join,
