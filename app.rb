@@ -111,7 +111,7 @@ class CreditCardAPI < Sinatra::Base
     begin
       cards = card_index
     rescue
-      halt 500   
+      halt 500
     end
     cards.to_json
   end
@@ -120,14 +120,13 @@ class CreditCardAPI < Sinatra::Base
     card_list = get_card_number(creditcards)
     c_index = {user_id: @user_id, cards: card_list }
     settings.cards_cache.set(@user_id, c_index.to_json)
-
+    c_index
   end
 
   def get_card_number(creditcards)
     creditcards.each do |x|
       secret_box = RbNaCl::SecretBox.new(key)
       x[:encrypted_number] = ("*"*12) + secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join
-      puts x[:encrypted_number]
     end
   end
 
