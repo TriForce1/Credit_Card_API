@@ -5,6 +5,14 @@ module LuhnValidator
   # assumes: a local String called 'number' exists
   # returns: true/false whether last digit is correct
   def validate_checksum
+
+    result = Integer(number) rescue false
+
+    # Validate for string length and correct type
+    if result == false || number.length < 2
+      return false
+    end
+
     nums_a = number.to_s.chars.map(&:to_i)
 
     # TODO: use the integers in nums_a to validate its last check digit
