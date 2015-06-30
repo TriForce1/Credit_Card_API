@@ -128,14 +128,13 @@ class CreditCardAPI < Sinatra::Base
     creditcards.each do |x|
       secret_box = RbNaCl::SecretBox.new(key)
       x[:encrypted_number] = ("*"*12) + secret_box.decrypt(Base64.decode64(x[:nonce]), Base64.decode64(x[:encrypted_number])).split(//).last(4).join
-    end  
+    end
   end
 
   def get_user_id_from_header(authorization)
     scheme, jwt = authorization.split(' ')
     ui_key = OpenSSL::PKey::RSA.new(Base64.urlsafe_decode64(ENV['UI_PUBLIC_KEY']))
     payload, header = JWT.decode jwt, ui_key
-    return payload['sub'].to_s
+    payload['sub']
   end
-
 end
